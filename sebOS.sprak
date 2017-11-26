@@ -1,0 +1,94 @@
+var DEBUG = True
+
+void Debug(msg)
+    if DEBUG == True
+        msg = "DEBUG: " + msg
+        Print(msg)
+    end
+end
+
+array Split(text, character)
+    var ret = []
+    var thisWord = ""
+        
+    loop x in text
+        if x != character
+            thisWord = thisWord + x
+        else
+            Append(ret,thisWord)
+            thisWord = ""
+        end
+    end
+    if thisWord != ""
+        Append(ret,thisWord)
+    end
+    return ret
+end
+        
+
+void StoreServer(name)
+    var message = "Adding " + name + " to server list"
+    var serverName = "server:" + name
+    Print(message)
+    SaveMemory(serverName, serverName)
+end
+
+array GetAllServers()
+    var allMemory = GetMemories()
+    var servers = []
+    var namespaced
+    loop memory in allMemory
+        namespaced = Split(memory, ":")
+        if Count(namespaced) > 1
+            if namespaced[0] == "server"
+                Append(servers, namespaced[1])
+            end
+        end
+    end
+    return servers
+end
+
+void PrintAllServers()
+    loop server in GetAllServers()
+        Print(server)
+    end
+end
+
+void ConnectAllServers()
+    loop server in GetAllServers()
+        Connect(server)
+    end
+end
+
+void Menu()
+    var banner = "Welcome to " + Name()
+    var helpText = "Enter command (h for help)"
+    Print(banner)
+    Print(helpText)
+    var prompt = "sebOS: "
+    var cmd
+    loop
+        cmd = Input(prompt)
+        if cmd == "h"
+            Print("h - this helptext")
+            Print("p - print servers")
+            Print("c - connect to all servers")
+            Print("s - slurp")
+            Print("b - Boot from Floppy")
+        else if cmd == "p"
+            PrintAllServers()
+        else if cmd == "c"
+            ConnectAllServers()
+        else if cmd == "s"
+            Slurp()
+        else if cmd == "b"
+            if HasFloppy()
+                BootFromFloppy()
+            else
+                Print("Needs a floppy")
+            end
+        end
+    end
+end
+
+Menu()
